@@ -1,0 +1,50 @@
+PROGRESS LOG -- Artist Portfolio Platform
+Append-only. Do not delete or overwrite old entries.
+
+===========================================
+DATE: 7/1/2026
+WORKED ON BY: Nimith
+-------------------------------------------
+DONE TODAY:
+- Read and adopted CLAUDE.md (renamed from CLAUDE_NIMITH.md so it auto-loads
+  each session) and DEV-PROMPT-PACK.md as the project's governing rules.
+- Proposed and got approval for the database schema: tbl_artists,
+  tbl_artworks, tbl_reports.
+- Scaffolded the Next.js project at the repo root (TypeScript, Tailwind CSS,
+  App Router, ESLint).
+- Wrote Supabase migration SQL in supabase/migrations/:
+  - tbl_artists (1:1 with auth.users, slug/bio/skills constraints, updated_at
+    trigger)
+  - tbl_artworks (title/description constraints, BEFORE INSERT trigger that
+    enforces the 20-artwork cap at the database level)
+  - tbl_reports (reason restricted to stolen_art/inappropriate/other)
+  - RLS policies: public read on artists/artworks, owner-only write checked
+    against auth.uid(), public insert-only on reports (no public read)
+- Created .env.example listing required Supabase and Cloudinary variable
+  names (no real values).
+- Confirmed .gitignore (from create-next-app) already covers .env*,
+  node_modules, .next, etc.
+
+DECISIONS MADE:
+- Image pipeline: upload goes straight to Cloudinary for resize/compression
+  and hosting/CDN; the resulting Cloudinary URL is stored in the database.
+  Decided against also copying the file into Supabase Storage afterward --
+  that would mean paying for storage and bandwidth twice for no benefit.
+- Skills field is a simple free-text tag list (text[]), capped at 15 tags,
+  no predefined taxonomy.
+- Contact info uses a fixed set of optional fields: email, Instagram,
+  Facebook, X, website -- not an open-ended list.
+- Report reasons restricted to exactly: stolen_art, inappropriate, other.
+
+STILL PENDING / NEXT TIME:
+- Nimith needs to create the Supabase project and Cloudinary account, then
+  hand over the env var values (see .env.example for the names needed).
+- Migrations have been written but not yet run against a live Supabase
+  project.
+- No application code yet (auth flow, artist signup/slug generation,
+  profile edit, artwork upload/reorder, homepage browse/search, report
+  button).
+- RLS policies still need to be tested with two real artist accounts once
+  the project is live (log in as Artist A, confirm editing Artist B's data
+  fails).
+===========================================

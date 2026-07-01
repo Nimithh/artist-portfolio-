@@ -1,0 +1,5 @@
+BUG LOG -- Artist Portfolio Platform
+Append-only. Number bugs sequentially (BUG #001, #002, ...). Do not delete
+old entries, even after they're fixed.
+
+No bugs logged yet.
