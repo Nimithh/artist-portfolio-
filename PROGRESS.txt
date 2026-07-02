@@ -92,3 +92,51 @@ STILL PENDING / NEXT TIME:
 - Re-run the two-account RLS test against the live Supabase project once
   it exists (local test passed, but live config should be confirmed).
 ===========================================
+
+===========================================
+DATE: 7/2/2026 (second session, same day)
+WORKED ON BY: Nimith (session run with Claude)
+-------------------------------------------
+DONE TODAY:
+- Extended the schema per Nimith's go-ahead: image_public_id, width/height,
+  medium, year_created, updated_at on tbl_artworks; photo_public_id on
+  tbl_artists; status (new/reviewed) on tbl_reports. Re-ran the full local
+  Postgres test suite: all migrations apply, all 15 tests pass.
+- Built the entire MVP web app on Nimith's instruction to "build everything":
+  - Auth: signup (with email-confirmation handling), login, logout via
+    Supabase Auth; session refresh in src/proxy.ts.
+  - Dashboard: create/edit profile (slug auto-suggested from name), profile
+    photo upload, artwork upload/edit/reorder/delete with the 20 cap shown.
+  - Public pages: homepage with artist browse + search by name/skill;
+    artist page at /[slug] with gallery, contact links, report button.
+  - API routes: artwork upload (server-side file validation by real file
+    bytes, Cloudinary signed upload, orphan cleanup on failure), artwork
+    delete (ownership-checked, cleans Cloudinary), profile photo, and
+    anonymous reports (rate-limited 5 per 10 min per IP, in-memory).
+  - Design: Fraunces + Inter (Google Fonts), lucide-react icons plus
+    simple-icons for brand logos (lucide v1 dropped brand icons). No emoji.
+- Verified: production build compiles clean, ESLint passes, and a running
+  server smoke test passed (pages 200, dashboard redirects to login when
+  logged out, APIs reject bad input/no auth, rate limiter returns 429).
+  NOT yet tested against a real Supabase/Cloudinary account -- that needs
+  the live keys.
+- Added MAP.md (project file index) and removed CLOUDINARY_UPLOAD_PRESET
+  from .env.example (server-signed uploads do not need a preset).
+
+DECISIONS MADE:
+- Uploads go through server API routes with signed Cloudinary uploads, so
+  the Cloudinary secret stays server-side and files are validated by their
+  real bytes, not the browser's claim.
+- Rate limiting is in-memory per instance for now (documented limitation);
+  swap for Upstash Redis later if abuse becomes real.
+- Renamed middleware.ts to proxy.ts (Next 16 deprecated the middleware
+  file convention).
+
+STILL PENDING / NEXT TIME:
+- Nimith: create Supabase + Cloudinary accounts, fill .env.local, run the
+  4 migrations in the Supabase SQL editor, then test the real flows
+  end-to-end (see chat for the exact step-by-step).
+- GitHub push is still blocked (app has read-only access); grant write
+  access so the branch can be pushed.
+- After live setup: two-account RLS test, and consider Vercel deploy.
+===========================================

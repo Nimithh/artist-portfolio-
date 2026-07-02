@@ -7,8 +7,12 @@ create table public.tbl_reports (
   artwork_id uuid not null references public.tbl_artworks (id) on delete cascade,
   reason text not null,
   note text,
+  -- Lets the owner mark reports as handled when reviewing them in the
+  -- Supabase dashboard.
+  status text not null default 'new',
   created_at timestamptz not null default now(),
   constraint reason_allowed check (reason in ('stolen_art', 'inappropriate', 'other')),
+  constraint status_allowed check (status in ('new', 'reviewed')),
   constraint note_length check (note is null or char_length(note) <= 500)
 );
 

@@ -10,6 +10,9 @@ create table public.tbl_artists (
   display_name text not null,
   bio text,
   photo_url text,
+  -- Cloudinary asset id for the profile photo, needed to delete the old
+  -- file from Cloudinary when the photo is replaced.
+  photo_public_id text,
   skills text[] not null default '{}',
   contact_email text,
   instagram_url text,
@@ -31,6 +34,7 @@ create table public.tbl_artists (
   constraint display_name_length check (char_length(display_name) between 1 and 80),
   constraint bio_length check (bio is null or char_length(bio) <= 1000),
   constraint skills_count check (cardinality(skills) <= 15),
+  constraint photo_public_id_length check (photo_public_id is null or char_length(photo_public_id) <= 255),
   constraint contact_email_length check (contact_email is null or char_length(contact_email) <= 255),
   constraint instagram_url_length check (instagram_url is null or char_length(instagram_url) <= 2048),
   constraint facebook_url_length check (facebook_url is null or char_length(facebook_url) <= 2048),
