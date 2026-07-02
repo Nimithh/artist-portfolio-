@@ -48,3 +48,95 @@ STILL PENDING / NEXT TIME:
   the project is live (log in as Artist A, confirm editing Artist B's data
   fails).
 ===========================================
+
+===========================================
+DATE: 7/2/2026
+WORKED ON BY: Nimith (session run with Claude)
+-------------------------------------------
+DONE TODAY:
+- Full audit pass of the project (logic, security, API, secrets, rate
+  limiting). Main finding: no application code exists yet, so most checks
+  apply to the database layer only. Secrets hygiene and RLS design passed
+  review; a few database-level issues were found and then fixed after
+  go-ahead:
+- Fixed race condition in the 20-artwork cap trigger (BUG #001, see
+  BUGLOG.txt).
+- Added reserved-slug constraint on tbl_artists so nobody can register
+  slugs like admin, api, login as their public page URL.
+- Added a flood cap on tbl_reports (max 50 reports per artwork, enforced
+  by trigger) so anonymous report inserts cannot bloat the database. Real
+  per-visitor rate limiting still needs to be built into the report API
+  route later.
+- Pinned search_path = '' on all trigger functions and made the two
+  counting triggers security definer (needed for their row locks, and
+  standard Supabase hardening).
+- Removed redundant tbl_artists_slug_idx (the unique constraint already
+  creates an index) and added a sort_order range check (0-999).
+- Tested everything against a local Postgres 16: all 4 migrations apply
+  cleanly, plus 14 functional tests (cross-artist writes blocked by RLS,
+  reserved slug rejected, artwork cap holds, reports invisible to anon,
+  flood cap holds) and a two-session concurrency test proving the race
+  fix works. All passed.
+
+DECISIONS MADE:
+- Report flood protection lives at the database level as a per-artwork
+  cap (50); per-visitor rate limiting will be added in the API route
+  when the report feature is built (proposed: Upstash Redis).
+- Migrations were edited in place rather than adding new migration files,
+  since they have never been run against a live Supabase project.
+
+STILL PENDING / NEXT TIME:
+- Everything from the 7/1 entry still stands: create Supabase + Cloudinary
+  accounts, fill .env.local, run migrations, then start building the app
+  (auth, profiles, upload, public pages, report route with rate limiting).
+- Re-run the two-account RLS test against the live Supabase project once
+  it exists (local test passed, but live config should be confirmed).
+===========================================
+
+===========================================
+DATE: 7/2/2026 (second session, same day)
+WORKED ON BY: Nimith (session run with Claude)
+-------------------------------------------
+DONE TODAY:
+- Extended the schema per Nimith's go-ahead: image_public_id, width/height,
+  medium, year_created, updated_at on tbl_artworks; photo_public_id on
+  tbl_artists; status (new/reviewed) on tbl_reports. Re-ran the full local
+  Postgres test suite: all migrations apply, all 15 tests pass.
+- Built the entire MVP web app on Nimith's instruction to "build everything":
+  - Auth: signup (with email-confirmation handling), login, logout via
+    Supabase Auth; session refresh in src/proxy.ts.
+  - Dashboard: create/edit profile (slug auto-suggested from name), profile
+    photo upload, artwork upload/edit/reorder/delete with the 20 cap shown.
+  - Public pages: homepage with artist browse + search by name/skill;
+    artist page at /[slug] with gallery, contact links, report button.
+  - API routes: artwork upload (server-side file validation by real file
+    bytes, Cloudinary signed upload, orphan cleanup on failure), artwork
+    delete (ownership-checked, cleans Cloudinary), profile photo, and
+    anonymous reports (rate-limited 5 per 10 min per IP, in-memory).
+  - Design: Fraunces + Inter (Google Fonts), lucide-react icons plus
+    simple-icons for brand logos (lucide v1 dropped brand icons). No emoji.
+- Verified: production build compiles clean, ESLint passes, and a running
+  server smoke test passed (pages 200, dashboard redirects to login when
+  logged out, APIs reject bad input/no auth, rate limiter returns 429).
+  NOT yet tested against a real Supabase/Cloudinary account -- that needs
+  the live keys.
+- Added MAP.md (project file index) and removed CLOUDINARY_UPLOAD_PRESET
+  from .env.example (server-signed uploads do not need a preset).
+
+DECISIONS MADE:
+- Uploads go through server API routes with signed Cloudinary uploads, so
+  the Cloudinary secret stays server-side and files are validated by their
+  real bytes, not the browser's claim.
+- Rate limiting is in-memory per instance for now (documented limitation);
+  swap for Upstash Redis later if abuse becomes real.
+- Renamed middleware.ts to proxy.ts (Next 16 deprecated the middleware
+  file convention).
+
+STILL PENDING / NEXT TIME:
+- Nimith: create Supabase + Cloudinary accounts, fill .env.local, run the
+  4 migrations in the Supabase SQL editor, then test the real flows
+  end-to-end (see chat for the exact step-by-step).
+- GitHub push is still blocked (app has read-only access); grant write
+  access so the branch can be pushed.
+- After live setup: two-account RLS test, and consider Vercel deploy.
+===========================================
