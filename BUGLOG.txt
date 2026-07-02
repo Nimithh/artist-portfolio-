@@ -39,3 +39,36 @@ FILES CHANGED:
 
 FIXED BY: Claude (approved by Nimith) on 7/2/2026
 ===========================================
+
+===========================================
+BUG #002
+DATE FOUND: 7/2/2026
+FOUND BY: Nimith (saw "server error" on the fresh Vercel deploy)
+STATUS: FIXED
+-------------------------------------------
+WHAT WAS WRONG:
+- The deployed site returned a server error on every page when the
+  Supabase environment variables were not set yet (fresh Vercel deploy
+  before configuration).
+
+CAUSE (root cause, if known):
+- src/proxy.ts (session middleware, runs on every request) passed the
+  env vars to createServerClient with a non-null assertion. With the
+  vars missing, the client constructor threw, which killed every request
+  with a 500 before any page could render. Pages had graceful fallbacks,
+  but the proxy ran first and never let them load.
+
+HOW IT WAS FIXED:
+- proxy.ts now checks the two env vars first; if missing, it logs the
+  problem server-side and skips session handling, so pages render in
+  their logged-out state with friendly "could not load" messages.
+- Verified by running the production build with zero env vars: homepage
+  and login return 200 and show the fallback text instead of a 500.
+- Note: this makes a misconfigured deploy degrade gracefully. The real
+  deploy still needs the env vars set in Vercel to actually work.
+
+FILES CHANGED:
+- src/proxy.ts
+
+FIXED BY: Claude on 7/2/2026
+===========================================
