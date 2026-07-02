@@ -19,6 +19,15 @@ create table public.tbl_artists (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint slug_format check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length(slug) <= 60),
+  -- Slugs become public page URLs, so they must not collide with the app's
+  -- own routes (e.g. an artist claiming /login or /api).
+  constraint slug_not_reserved check (slug not in (
+    'admin', 'api', 'auth', 'login', 'logout', 'signup', 'signin', 'register',
+    'settings', 'account', 'dashboard', 'profile', 'artist', 'artists',
+    'artwork', 'artworks', 'report', 'reports', 'about', 'contact', 'help',
+    'terms', 'privacy', 'search', 'new', 'edit', 'home', 'static', 'assets',
+    'public'
+  )),
   constraint display_name_length check (char_length(display_name) between 1 and 80),
   constraint bio_length check (bio is null or char_length(bio) <= 1000),
   constraint skills_count check (cardinality(skills) <= 15),
@@ -29,15 +38,20 @@ create table public.tbl_artists (
   constraint website_url_length check (website_url is null or char_length(website_url) <= 2048)
 );
 
-create index tbl_artists_slug_idx on public.tbl_artists (slug);
+-- No separate index on slug: the unique constraint above already creates one.
 
+-- search_path is pinned to '' so the function can't be hijacked by objects
+-- created in other schemas (built-ins still resolve via pg_catalog).
 create or replace function public.set_updated_at()
-returns trigger as $$
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
 begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$;
 
 create trigger tbl_artists_set_updated_at
 before update on public.tbl_artists

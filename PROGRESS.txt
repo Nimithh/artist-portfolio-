@@ -48,3 +48,47 @@ STILL PENDING / NEXT TIME:
   the project is live (log in as Artist A, confirm editing Artist B's data
   fails).
 ===========================================
+
+===========================================
+DATE: 7/2/2026
+WORKED ON BY: Nimith (session run with Claude)
+-------------------------------------------
+DONE TODAY:
+- Full audit pass of the project (logic, security, API, secrets, rate
+  limiting). Main finding: no application code exists yet, so most checks
+  apply to the database layer only. Secrets hygiene and RLS design passed
+  review; a few database-level issues were found and then fixed after
+  go-ahead:
+- Fixed race condition in the 20-artwork cap trigger (BUG #001, see
+  BUGLOG.txt).
+- Added reserved-slug constraint on tbl_artists so nobody can register
+  slugs like admin, api, login as their public page URL.
+- Added a flood cap on tbl_reports (max 50 reports per artwork, enforced
+  by trigger) so anonymous report inserts cannot bloat the database. Real
+  per-visitor rate limiting still needs to be built into the report API
+  route later.
+- Pinned search_path = '' on all trigger functions and made the two
+  counting triggers security definer (needed for their row locks, and
+  standard Supabase hardening).
+- Removed redundant tbl_artists_slug_idx (the unique constraint already
+  creates an index) and added a sort_order range check (0-999).
+- Tested everything against a local Postgres 16: all 4 migrations apply
+  cleanly, plus 14 functional tests (cross-artist writes blocked by RLS,
+  reserved slug rejected, artwork cap holds, reports invisible to anon,
+  flood cap holds) and a two-session concurrency test proving the race
+  fix works. All passed.
+
+DECISIONS MADE:
+- Report flood protection lives at the database level as a per-artwork
+  cap (50); per-visitor rate limiting will be added in the API route
+  when the report feature is built (proposed: Upstash Redis).
+- Migrations were edited in place rather than adding new migration files,
+  since they have never been run against a live Supabase project.
+
+STILL PENDING / NEXT TIME:
+- Everything from the 7/1 entry still stands: create Supabase + Cloudinary
+  accounts, fill .env.local, run migrations, then start building the app
+  (auth, profiles, upload, public pages, report route with rate limiting).
+- Re-run the two-account RLS test against the live Supabase project once
+  it exists (local test passed, but live config should be confirmed).
+===========================================

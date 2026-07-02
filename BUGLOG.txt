@@ -2,4 +2,40 @@ BUG LOG -- Artist Portfolio Platform
 Append-only. Number bugs sequentially (BUG #001, #002, ...). Do not delete
 old entries, even after they're fixed.
 
-No bugs logged yet.
+===========================================
+BUG #001
+DATE FOUND: 7/2/2026
+FOUND BY: Claude (during the code audit Nimith requested)
+STATUS: FIXED
+-------------------------------------------
+WHAT WAS WRONG:
+- The 20-artwork cap trigger (enforce_artwork_limit) could be beaten by
+  two inserts running at the same time. Both would count 19 existing
+  artworks, both would pass the check, and the artist would end up with
+  21 artworks.
+
+CAUSE (root cause, if known):
+- Classic check-then-act race: the trigger counted rows and then allowed
+  the insert, but nothing stopped a second transaction from doing the
+  same count in parallel before either insert was committed. The count
+  can't see the other transaction's uncommitted row.
+
+HOW IT WAS FIXED:
+- The trigger now locks the artist's row in tbl_artists (select ... for
+  update) before counting. Two inserts for the same artist are forced to
+  run the check one at a time, so the second one sees the first one's
+  row and gets rejected. The function was made security definer so the
+  lock works regardless of the caller's RLS policies.
+- Verified with a live two-session test on local Postgres 16: artist at
+  19 artworks, two concurrent inserts, second one correctly blocked then
+  rejected, final count exactly 20.
+- The new report flood cap trigger (enforce_report_limit) uses the same
+  lock-then-count pattern so it does not inherit the same bug.
+
+FILES CHANGED:
+- supabase/migrations/20260701000002_create_tbl_artworks.sql
+- supabase/migrations/20260701000003_create_tbl_reports.sql (same
+  pattern applied preventively)
+
+FIXED BY: Claude (approved by Nimith) on 7/2/2026
+===========================================
