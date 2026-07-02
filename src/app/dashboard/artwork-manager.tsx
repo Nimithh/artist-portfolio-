@@ -122,20 +122,20 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-zinc-300 p-2.5 text-sm outline-none focus:border-zinc-500";
+    "mt-1 w-full rounded-lg border border-border bg-background p-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent";
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-zinc-200 p-5">
+      <div className="rounded-2xl border border-border bg-surface p-5">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium">Add artwork</h3>
-          <span className="text-sm text-zinc-500">
+          <h3 className="font-medium text-foreground">Add artwork</h3>
+          <span className="text-sm text-muted-foreground">
             {artworks.length} of {ARTWORK_LIMIT}
           </span>
         </div>
 
         {atLimit ? (
-          <p className="mt-3 text-sm text-zinc-600">
+          <p className="mt-3 text-sm text-muted-foreground">
             You have reached the limit of {ARTWORK_LIMIT} artworks. Delete one to
             add another.
           </p>
@@ -147,13 +147,13 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-zinc-600 file:mr-4 file:rounded-full file:border-0 file:bg-zinc-100 file:px-4 file:py-2 file:text-sm file:text-zinc-700 hover:file:bg-zinc-200"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-full file:border-0 file:bg-muted file:px-4 file:py-2 file:text-sm file:text-foreground hover:file:bg-border"
               />
-              <p className="mt-1 text-xs text-zinc-500">JPEG, PNG, or WebP, up to 10 MB.</p>
+              <p className="mt-1 text-xs text-muted-foreground">JPEG, PNG, or WebP, up to 10 MB.</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="art_title" className="text-sm font-medium text-zinc-700">
+                <label htmlFor="art_title" className="text-sm font-medium text-foreground">
                   Title
                 </label>
                 <input
@@ -167,7 +167,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
                 />
               </div>
               <div>
-                <label htmlFor="art_medium" className="text-sm font-medium text-zinc-700">
+                <label htmlFor="art_medium" className="text-sm font-medium text-foreground">
                   Medium (optional)
                 </label>
                 <input
@@ -181,7 +181,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
                 />
               </div>
               <div>
-                <label htmlFor="art_year" className="text-sm font-medium text-zinc-700">
+                <label htmlFor="art_year" className="text-sm font-medium text-foreground">
                   Year (optional)
                 </label>
                 <input
@@ -196,7 +196,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
               </div>
             </div>
             <div>
-              <label htmlFor="art_description" className="text-sm font-medium text-zinc-700">
+              <label htmlFor="art_description" className="text-sm font-medium text-foreground">
                 Description (optional)
               </label>
               <textarea
@@ -212,7 +212,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
             <button
               type="submit"
               disabled={uploading}
-              className="flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-2.5 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               {uploading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -228,15 +228,15 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
       {listError && <p className="text-sm text-red-600">{listError}</p>}
 
       {artworks.length === 0 ? (
-        <p className="text-sm text-zinc-600">No artworks yet. Add your first one above.</p>
+        <p className="text-sm text-muted-foreground">No artworks yet. Add your first one above.</p>
       ) : (
         <ul className="space-y-3">
           {artworks.map((artwork, index) => (
             <li
               key={artwork.id}
-              className="flex items-start gap-4 rounded-xl border border-zinc-200 p-4"
+              className="flex items-start gap-4 rounded-xl border border-border bg-surface p-4"
             >
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
                 <Image
                   src={artwork.image_url}
                   alt={artwork.title}
@@ -258,14 +258,14 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
               ) : (
                 <>
                   <div className="min-w-0 flex-1">
-                    <h4 className="truncate font-medium">{artwork.title}</h4>
+                    <h4 className="truncate font-medium text-foreground">{artwork.title}</h4>
                     {(artwork.medium || artwork.year_created) && (
-                      <p className="text-sm text-zinc-500">
+                      <p className="text-sm text-muted-foreground">
                         {[artwork.medium, artwork.year_created].filter(Boolean).join(", ")}
                       </p>
                     )}
                     {artwork.description && (
-                      <p className="mt-1 line-clamp-2 text-sm text-zinc-600">
+                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                         {artwork.description}
                       </p>
                     )}
@@ -277,7 +277,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
                       disabled={busyId !== null || index === 0}
                       aria-label="Move up"
                       title="Move up"
-                      className="rounded-full p-2 text-zinc-500 hover:bg-zinc-100 disabled:opacity-30"
+                      className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-accent disabled:opacity-30"
                     >
                       <ArrowUp className="h-4 w-4" />
                     </button>
@@ -287,7 +287,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
                       disabled={busyId !== null || index === artworks.length - 1}
                       aria-label="Move down"
                       title="Move down"
-                      className="rounded-full p-2 text-zinc-500 hover:bg-zinc-100 disabled:opacity-30"
+                      className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-accent disabled:opacity-30"
                     >
                       <ArrowDown className="h-4 w-4" />
                     </button>
@@ -297,7 +297,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
                       disabled={busyId !== null}
                       aria-label="Edit"
                       title="Edit"
-                      className="rounded-full p-2 text-zinc-500 hover:bg-zinc-100 disabled:opacity-30"
+                      className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-accent disabled:opacity-30"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
@@ -307,7 +307,7 @@ export default function ArtworkManager({ artworks }: { artworks: Artwork[] }) {
                       disabled={busyId !== null}
                       aria-label="Delete"
                       title="Delete"
-                      className="rounded-full p-2 text-zinc-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-30"
+                      className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-30"
                     >
                       {busyId === artwork.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -378,17 +378,17 @@ function EditForm({
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-zinc-300 p-2 text-sm outline-none focus:border-zinc-500";
+    "mt-1 w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground outline-none transition-colors focus:border-accent";
 
   return (
     <form onSubmit={save} className="flex-1 space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-zinc-700">Edit artwork</h4>
+        <h4 className="text-sm font-medium text-foreground">Edit artwork</h4>
         <button
           type="button"
           onClick={onClose}
           aria-label="Cancel"
-          className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
+          className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </button>
@@ -433,7 +433,7 @@ function EditForm({
       <button
         type="submit"
         disabled={saving}
-        className="flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+        className="flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-50"
       >
         {saving && <Loader2 className="h-4 w-4 animate-spin" />}
         Save changes

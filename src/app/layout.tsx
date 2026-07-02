@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import ThemeToggle from "./theme-toggle";
 import "./globals.css";
+
+// Runs before paint so a dark-mode visitor never sees a white flash.
+// Static string only -- no user input goes anywhere near it.
+const themeInitScript = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
 
 const fraunces = Fraunces({
   variable: "--font-heading",
@@ -40,32 +45,47 @@ export default async function RootLayout({
   const user = await getSessionUser();
 
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-white text-zinc-900 antialiased">
-        <header className="border-b border-zinc-200">
+    <html
+      lang="en"
+      className={`${fraunces.variable} ${inter.variable} h-full`}
+      suppressHydrationWarning
+    >
+      <body className="flex min-h-full flex-col bg-background text-foreground antialiased">
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-sm">
           <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="font-heading text-xl font-semibold tracking-tight">
+            <Link
+              href="/"
+              className="font-heading text-xl font-semibold tracking-tight transition-colors hover:text-accent"
+            >
               Artist Portfolio
             </Link>
             <nav className="flex items-center gap-5 text-sm">
-              <Link href="/" className="text-zinc-600 hover:text-zinc-900">
+              <ThemeToggle />
+              <Link
+                href="/"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
                 Browse
               </Link>
               {user ? (
                 <Link
                   href="/dashboard"
-                  className="rounded-full bg-zinc-900 px-4 py-1.5 text-white hover:bg-zinc-700"
+                  className="rounded-full bg-accent px-4 py-1.5 text-accent-foreground transition-colors hover:bg-accent-hover"
                 >
                   Dashboard
                 </Link>
               ) : (
                 <>
-                  <Link href="/login" className="text-zinc-600 hover:text-zinc-900">
+                  <Link
+                    href="/login"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                  >
                     Log in
                   </Link>
                   <Link
                     href="/signup"
-                    className="rounded-full bg-zinc-900 px-4 py-1.5 text-white hover:bg-zinc-700"
+                    className="rounded-full bg-accent px-4 py-1.5 text-accent-foreground transition-colors hover:bg-accent-hover"
                   >
                     Sign up
                   </Link>
@@ -75,8 +95,8 @@ export default async function RootLayout({
           </div>
         </header>
         <div className="flex flex-1 flex-col">{children}</div>
-        <footer className="border-t border-zinc-200 py-6">
-          <p className="mx-auto w-full max-w-6xl px-4 text-sm text-zinc-500 sm:px-6">
+        <footer className="border-t border-border py-6">
+          <p className="mx-auto w-full max-w-6xl px-4 text-sm text-muted-foreground sm:px-6">
             Artist Portfolio
           </p>
         </footer>

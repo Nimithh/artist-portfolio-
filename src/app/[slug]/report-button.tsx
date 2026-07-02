@@ -57,27 +57,27 @@ export default function ReportButton({ artworkId }: { artworkId: string }) {
         onClick={() => setOpen(true)}
         aria-label="Report this artwork"
         title="Report this artwork"
-        className="rounded-full p-2 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
+        className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-accent"
       >
         <Flag className="h-4 w-4" />
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="animate-overlay-in fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm"
           onClick={close}
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            className="animate-modal-in w-full max-w-md rounded-xl bg-surface p-6 shadow-xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-heading text-lg font-semibold">Report this artwork</h2>
+              <h2 className="font-heading text-lg font-semibold text-foreground">Report this artwork</h2>
               <button
                 type="button"
                 onClick={close}
                 aria-label="Close"
-                className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
+                className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -85,13 +85,13 @@ export default function ReportButton({ artworkId }: { artworkId: string }) {
 
             {done ? (
               <div className="mt-4">
-                <p className="text-zinc-700">
+                <p className="text-foreground">
                   Thank you. The report was submitted and will be reviewed.
                 </p>
                 <button
                   type="button"
                   onClick={close}
-                  className="mt-4 rounded-full bg-zinc-900 px-5 py-2 text-sm text-white hover:bg-zinc-700"
+                  className="mt-4 rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
                 >
                   Close
                 </button>
@@ -99,24 +99,25 @@ export default function ReportButton({ artworkId }: { artworkId: string }) {
             ) : (
               <form onSubmit={submit} className="mt-4 space-y-4">
                 <fieldset className="space-y-2">
-                  <legend className="text-sm font-medium text-zinc-700">
+                  <legend className="text-sm font-medium text-foreground">
                     Why are you reporting this?
                   </legend>
                   {REASONS.map((option) => (
-                    <label key={option.value} className="flex items-center gap-2 text-sm">
+                    <label key={option.value} className="flex items-center gap-2 text-sm text-foreground">
                       <input
                         type="radio"
                         name="reason"
                         value={option.value}
                         checked={reason === option.value}
                         onChange={() => setReason(option.value)}
+                        className="accent-accent"
                       />
                       {option.label}
                     </label>
                   ))}
                 </fieldset>
                 <div>
-                  <label htmlFor={`note-${artworkId}`} className="text-sm font-medium text-zinc-700">
+                  <label htmlFor={`note-${artworkId}`} className="text-sm font-medium text-foreground">
                     Details (optional)
                   </label>
                   <textarea
@@ -125,14 +126,14 @@ export default function ReportButton({ artworkId }: { artworkId: string }) {
                     onChange={(event) => setNote(event.target.value)}
                     maxLength={500}
                     rows={3}
-                    className="mt-1 w-full rounded-lg border border-zinc-300 p-2 text-sm outline-none focus:border-zinc-500"
+                    className="mt-1 w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground outline-none transition-colors focus:border-accent"
                   />
                 </div>
                 {message && <p className="text-sm text-red-600">{message}</p>}
                 <button
                   type="submit"
                   disabled={sending}
-                  className="flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-50"
                 >
                   {sending && <Loader2 className="h-4 w-4 animate-spin" />}
                   Submit report

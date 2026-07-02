@@ -2,7 +2,7 @@
 // (lucide-react no longer ships brand logos). Rendered as plain SVGs so
 // they inherit the surrounding text color.
 
-import { siFacebook, siInstagram, siX } from "simple-icons";
+import { siFacebook, siInstagram, siTelegram, siX } from "simple-icons";
 
 function BrandIcon({ path, className }: { path: string; className?: string }) {
   return (
@@ -27,4 +27,8 @@ export function FacebookIcon({ className }: { className?: string }) {
 
 export function XIcon({ className }: { className?: string }) {
   return <BrandIcon path={siX.path} className={className} />;
+}
+
+export function TelegramIcon({ className }: { className?: string }) {
+  return <BrandIcon path={siTelegram.path} className={className} />;
 }

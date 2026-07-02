@@ -140,3 +140,99 @@ STILL PENDING / NEXT TIME:
   access so the branch can be pushed.
 - After live setup: two-account RLS test, and consider Vercel deploy.
 ===========================================
+
+===========================================
+DATE: 7/2/2026 (third session, same day, parallel chat)
+WORKED ON BY: Nimith (session run with Claude, separate conversation from
+the "second session" entry above)
+-------------------------------------------
+DONE TODAY:
+- Discovered that Nimith had two parallel Claude Code sessions running
+  against what looked like the same project: this one (in the real,
+  correctly-named artist-portfolio- folder, already containing the mature
+  MVP described above) and a second conversation that had been working,
+  unaware of this repo, inside a separate, differently-named folder
+  ("Artist portfolio", with a space) doing a full duplicate rebuild from
+  zero -- its own migrations, its own login/signup/dashboard/about pages,
+  none of it connected to this repo or its GitHub history.
+- With Nimith's go-ahead, deleted the duplicate folder entirely (it had no
+  unique history -- confirmed via git log before removing anything).
+- Ported the one genuinely useful thing from the duplicate work into this
+  real project: a "Warm Gallery" visual design (cream/charcoal/terracotta
+  color tokens, hover/entrance animations) that had been designed in
+  response to Nimith flagging the flat, animation-less default look --
+  the same flatness this real project's plain zinc/black-and-white styling
+  had. Applied it as a pure styling pass across globals.css, layout.tsx,
+  and every page/component in src/app -- no logic, data fetching, auth,
+  or API route code was touched. Verified with git diff --stat that only
+  the intended 11 files changed.
+- Verified npm run build and npm run lint both still pass after the
+  styling pass.
+- Attempted a dev-server route check and got 500s on every route -- traced
+  to the pre-existing, expected cause (src/proxy.ts throws because
+  .env.local still does not exist), not anything from this session's
+  changes. Confirmed via the dev server's own error log.
+
+DECISIONS MADE:
+- Chose to delete the duplicate folder rather than keep it "just in case,"
+  since it was pure duplicate effort with no independent value once its
+  one useful piece (the design) was ported over.
+- Kept this project's existing --font-heading / --font-body CSS variable
+  naming instead of renaming to match the duplicate's own convention, per
+  "match what's already there."
+
+STILL PENDING / NEXT TIME:
+- Everything from the two entries above still stands: fill .env.local with
+  real Supabase + Cloudinary keys, run the 4 migrations, then the 500s
+  from proxy.ts should resolve and the real end-to-end testing can start.
+- If another parallel session is still active on this same repo, the two
+  should be reconciled so work does not get duplicated again.
+===========================================
+
+===========================================
+DATE: 7/2/2026 (continued, same session as above)
+WORKED ON BY: Nimith (session run with Claude)
+-------------------------------------------
+DONE TODAY:
+- Live setup completed: Nimith created the Supabase project (Singapore
+  region) and Cloudinary account, filled .env.local (all 6 values verified
+  present and working -- Supabase REST and Cloudinary API both answered
+  200 with the configured keys). Disabled "Confirm email" in Supabase Auth
+  temporarily for easier testing -- MUST be re-enabled before launch.
+- Found and fixed the first live bug: artwork upload failed with a missing
+  image_height column. Root cause: the migrations Nimith originally ran in
+  the SQL editor were the older duplicate-folder versions (pre-dating this
+  repo's schema extensions), so the live tables were missing 6+ columns,
+  the race-safe artwork trigger, and the reports status column. Fix: one
+  combined reset script (drop the 3 tables + re-run this repo's 5
+  migrations); Nimith ran it and the schema now matches the code (verified
+  column-by-column via REST). The throwaway reset file was deleted after.
+- Added Telegram to artist contact links end-to-end: new migration
+  20260702000001_add_telegram_url.sql (run live), Artist type, dashboard
+  form field, public page icon (simple-icons siTelegram).
+- Made the social link fields honestly optional: switched them from
+  type="url" to type="text" with placeholder examples, because the
+  browser's native URL validation was blocking saves on fields that are
+  not required at all.
+- Built dark mode: class-based (.dark on <html>), token overrides in
+  globals.css (warm dark brown palette, brighter terracotta accent),
+  stateless Sun/Moon toggle in the header (CSS dark: variant picks the
+  icon, so no hydration mismatch), localStorage persistence, follows the
+  OS setting on first visit, pre-paint inline script prevents the white
+  flash. Verified in the served HTML/CSS.
+
+DECISIONS MADE:
+- Database fix was a full drop-and-recreate rather than per-column ALTER
+  patches, since only one test profile existed and a reset guarantees the
+  live schema exactly matches the migration files.
+- Dark palette stays warm (brown-black, not pure black) to keep the
+  gallery character; accent brightened for contrast on dark surfaces.
+
+STILL PENDING / NEXT TIME:
+- Nimith to re-create his profile (wiped by the reset) and confirm artwork
+  upload to Cloudinary works end-to-end -- both tables were still empty at
+  the time of this entry.
+- Re-enable "Confirm email" in Supabase Auth before real users sign up.
+- Google sign-in, homepage pagination, two-account RLS test, Vercel
+  deploy.
+===========================================

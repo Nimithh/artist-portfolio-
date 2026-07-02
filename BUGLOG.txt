@@ -39,3 +39,37 @@ FILES CHANGED:
 
 FIXED BY: Claude (approved by Nimith) on 7/2/2026
 ===========================================
+
+===========================================
+BUG #002
+DATE FOUND: 7/2/2026
+FOUND BY: Nimith (hit the error in the dashboard), diagnosed by Claude
+STATUS: FIXED
+-------------------------------------------
+WHAT WAS WRONG:
+- Artwork upload (and profile photo upload) always failed with the generic
+  "Could not save the artwork" message. Server log showed the real error:
+  "Could not find the 'image_height' column of 'tbl_artworks' in the
+  schema cache."
+
+CAUSE (root cause, if known):
+- The migrations originally run against the live Supabase project were an
+  older version of the schema from a duplicate project folder (see the
+  7/2 PROGRESS entry about the parallel-sessions mixup). The code expects
+  the newer schema: tbl_artworks was missing image_public_id, image_width,
+  image_height, medium, year_created, updated_at and the race-safe cap
+  trigger; tbl_artists was missing photo_public_id; tbl_reports was
+  missing status and the flood-cap trigger.
+
+HOW IT WAS FIXED:
+- One combined reset script: dropped the 3 tables and helper functions,
+  then re-ran this repo's 5 migration files in order. Nimith executed it
+  in the Supabase SQL editor. Verified afterward column-by-column over the
+  REST API that the live schema matches the code. Only test data was lost.
+
+FILES CHANGED:
+- None in the repo (live database only). The throwaway reset-database.sql
+  was deleted after use.
+
+FIXED BY: Nimith (ran the script) + Claude (diagnosis and script) on 7/2/2026
+===========================================

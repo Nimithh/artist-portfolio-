@@ -50,18 +50,18 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
           {profile ? "Your dashboard" : "Set up your artist page"}
         </h1>
         <SignOutButton />
       </div>
 
       {profile && (
-        <p className="mt-2 text-sm text-zinc-600">
+        <p className="mt-2 text-sm text-muted-foreground">
           Your public page:{" "}
           <Link
             href={`/${profile.slug}`}
-            className="inline-flex items-center gap-1 font-medium text-zinc-900 underline"
+            className="inline-flex items-center gap-1 font-medium text-accent hover:text-accent-hover"
           >
             /{profile.slug}
             <ExternalLink className="h-3.5 w-3.5" />
@@ -70,21 +70,21 @@ export default async function DashboardPage() {
       )}
 
       <section className="mt-8">
-        <h2 className="font-heading text-xl font-semibold">Profile</h2>
-        <div className="mt-4 rounded-xl border border-zinc-200 p-5">
+        <h2 className="font-heading text-xl font-semibold text-foreground">Profile</h2>
+        <div className="mt-4 rounded-2xl border border-border bg-surface p-5">
           <ProfileForm profile={profile} />
         </div>
       </section>
 
       {profile ? (
         <section className="mt-10">
-          <h2 className="font-heading text-xl font-semibold">Artworks</h2>
+          <h2 className="font-heading text-xl font-semibold text-foreground">Artworks</h2>
           <div className="mt-4">
             <ArtworkManager artworks={artworks} />
           </div>
         </section>
       ) : (
-        <p className="mt-8 text-sm text-zinc-600">
+        <p className="mt-8 text-sm text-muted-foreground">
           Save your profile first, then you can start adding artworks.
         </p>
       )}

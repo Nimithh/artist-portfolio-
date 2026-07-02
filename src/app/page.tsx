@@ -54,16 +54,16 @@ export default async function Home({
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
       <div className="max-w-2xl">
-        <h1 className="font-heading text-4xl font-semibold tracking-tight">
-          Find an artist
+        <h1 className="font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
+          Find an <span className="text-accent">artist</span>.
         </h1>
-        <p className="mt-2 text-zinc-600">
+        <p className="mt-2 text-muted-foreground">
           Browse portfolios from artists and get in touch directly.
         </p>
         <form method="get" action="/" className="mt-6 flex gap-2">
           <div className="relative flex-1">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
               aria-hidden
             />
             <input
@@ -72,12 +72,12 @@ export default async function Home({
               defaultValue={query}
               placeholder="Search by name or skill"
               maxLength={60}
-              className="w-full rounded-full border border-zinc-300 py-2 pl-9 pr-4 text-sm outline-none focus:border-zinc-500"
+              className="w-full rounded-full border border-border bg-surface py-2.5 pl-9 pr-4 text-sm text-foreground shadow-sm outline-none transition-shadow focus:border-accent focus:ring-4 focus:ring-accent/15"
             />
           </div>
           <button
             type="submit"
-            className="rounded-full bg-zinc-900 px-5 py-2 text-sm text-white hover:bg-zinc-700"
+            className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
           >
             Search
           </button>
@@ -86,42 +86,46 @@ export default async function Home({
 
       <div className="mt-10">
         {artists === null ? (
-          <p className="text-zinc-600">
+          <p className="text-muted-foreground">
             Could not load artists right now. Please try again in a moment.
           </p>
         ) : artists.length === 0 ? (
-          <p className="text-zinc-600">
+          <p className="text-muted-foreground">
             {query
               ? `No artists found for "${query}".`
               : "No artists have joined yet. Be the first!"}
           </p>
         ) : (
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {artists.map((artist) => (
-              <li key={artist.slug}>
+            {artists.map((artist, index) => (
+              <li
+                key={artist.slug}
+                style={{ animationDelay: `${Math.min(index, 10) * 60}ms` }}
+                className="animate-fade-in-up opacity-0"
+              >
                 <Link
                   href={`/${artist.slug}`}
-                  className="group block overflow-hidden rounded-xl border border-zinc-200 transition-shadow hover:shadow-md"
+                  className="group block overflow-hidden rounded-xl border border-border bg-surface transition-all duration-200 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5"
                 >
-                  <div className="relative aspect-[4/3] bg-zinc-100">
+                  <div className="relative aspect-[4/3] bg-muted">
                     {artist.photo_url ? (
                       <Image
                         src={artist.photo_url}
                         alt={artist.display_name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center">
-                        <span className="font-heading text-5xl text-zinc-300">
+                        <span className="font-heading text-5xl text-muted-foreground/50">
                           {artist.display_name.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
                   </div>
                   <div className="p-4">
-                    <h2 className="font-heading text-lg font-semibold group-hover:underline">
+                    <h2 className="font-heading text-lg font-semibold text-foreground group-hover:text-accent">
                       {artist.display_name}
                     </h2>
                     {artist.skills.length > 0 && (
@@ -129,7 +133,7 @@ export default async function Home({
                         {artist.skills.slice(0, 3).map((skill) => (
                           <span
                             key={skill}
-                            className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-zinc-600"
+                            className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-foreground/80"
                           >
                             {skill}
                           </span>
@@ -137,7 +141,7 @@ export default async function Home({
                       </div>
                     )}
                     {artist.bio && (
-                      <p className="mt-2 line-clamp-2 text-sm text-zinc-600">{artist.bio}</p>
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{artist.bio}</p>
                     )}
                   </div>
                 </Link>

@@ -1,14 +1,100 @@
 @import "tailwindcss";
 
+/* dark: utilities follow the .dark class set on <html>, not the OS setting
+   alone -- the class is what the toggle and the pre-paint script control. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #faf7f2;
+  --surface: #ffffff;
+  --foreground: #2a2620;
+  --muted: #efe8dd;
+  --muted-foreground: #8a8074;
+  --border: #e5ddd0;
+  --accent: #c1502e;
+  --accent-hover: #a83f21;
+  --accent-foreground: #ffffff;
+  color-scheme: light;
+}
+
+/* Dark mode: same warm-gallery feel, flipped. The whole app reads colors
+   through these tokens, so overriding them here is all it takes. */
+.dark {
+  --background: #1b1815;
+  --surface: #242019;
+  --foreground: #ece7de;
+  --muted: #322d25;
+  --muted-foreground: #9d9384;
+  --border: #3a342b;
+  --accent: #d96a45;
+  --accent-hover: #e5825f;
+  --accent-foreground: #ffffff;
+  color-scheme: dark;
+}
+
 @theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
   --font-heading: var(--font-heading), Georgia, serif;
   --font-body: var(--font-body), system-ui, sans-serif;
 }
 
 body {
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-body), system-ui, sans-serif;
 }
 
 .font-heading {
   font-family: var(--font-heading), Georgia, serif;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-overlay-in {
+  animation: overlay-in 0.2s ease-out both;
 }

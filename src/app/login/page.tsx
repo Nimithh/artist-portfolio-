@@ -36,53 +36,55 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-16">
-      <h1 className="font-heading text-3xl font-semibold tracking-tight">Log in</h1>
-      <form onSubmit={submit} className="mt-8 space-y-4">
-        <div>
-          <label htmlFor="email" className="text-sm font-medium text-zinc-700">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-300 p-2.5 text-sm outline-none focus:border-zinc-500"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="text-sm font-medium text-zinc-700">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-300 p-2.5 text-sm outline-none focus:border-zinc-500"
-          />
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 py-2.5 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
-        >
-          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          Log in
-        </button>
-      </form>
-      <p className="mt-6 text-sm text-zinc-600">
-        No account yet?{" "}
-        <Link href="/signup" className="font-medium text-zinc-900 underline">
-          Sign up
-        </Link>
-      </p>
+    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
+      <div className="animate-fade-in-up rounded-2xl border border-border bg-surface p-8">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">Log in</h1>
+        <form onSubmit={submit} className="mt-8 space-y-4">
+          <div>
+            <label htmlFor="email" className="text-sm font-medium text-foreground">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-border bg-background p-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="text-sm font-medium text-foreground">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-border bg-background p-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"
+            />
+          </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-50"
+          >
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            Log in
+          </button>
+        </form>
+        <p className="mt-6 text-sm text-muted-foreground">
+          No account yet?{" "}
+          <Link href="/signup" className="font-medium text-accent hover:text-accent-hover">
+            Sign up
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }
